@@ -1,0 +1,120 @@
+version: "3"
+
+services:
+  node:
+    image: node:16.14
+    container_name: learning_seq
+    build: .
+    tty: true
+    stdin_open: true
+    command: bash
+    restart: always
+    working_dir: /home/node/
+    volumes:
+      - ./:/home/node/
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: db 
+      PORT: '3306'
+
+  db:
+    container_name: orm_example_db
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - 3306:3306
+
+networks:
+  default:
+    name: orm_example_net
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  node:
+    image: node:16.14
+    container_name: learning_seq
+    build: .
+    tty: true
+    stdin_open: true
+    command: bash
+    restart: always
+    working_dir: /home/node/
+    volumes:
+      - ./:/home/node/
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: db 
+      PORT: '3306'
+
+  db:
+    container_name: orm_example_db
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - 3306:3306
+
+networks:
+  default:
+    name: orm_example_net
+
+
+
+
+
+
+
+
+
+
+version: "3"
+
+services:
+  job-db: mysql:5.7
+  container_name: orm_example_db
+  hostname: orm_example_db
+  env_file:
+    - ./.env
+  ports:
+    - '3306:3306'
+  job-api:
+    image: node:16.14
+    container_name: job-api
+    volumes:
+      - ./
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - '3000:3000':
+    environment:
+      NODE_ENV: development
+      WAIT_HOSTS: job-db:3000
+    depends_on:
+     - job-db
+    command: sh -c "/wait && npm run db:migrate && npm run db:seed && npm run start"
+
+
